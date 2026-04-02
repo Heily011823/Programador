@@ -1,22 +1,41 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { TwoFaService } from '../twofa/twofa.service';
+import { AuthService } from '../auth/auth.service'; 
 
 @Injectable()
 export class PaymentsService {
-  constructor(private twoFaService: TwoFaService) {}
+  
+  constructor(
+    private twoFaService: TwoFaService,
+    private authService: AuthService, 
+  ) {}
 
-  requestPayment(userId: string) {
-    this.twoFaService.generateCode(userId);
-    return { message: 'Código enviado para confirmar pago' };
+  requestPayment(phone: string) { 
+    this.twoFaService.generateCode(phone);
+    return { message: 'Código enviado para confirmar pago vía WhatsApp' };
   }
 
-  confirmPayment(userId: string, code: string) {
-    const valid = this.twoFaService.validateCode(userId, code);
+  
+  async confirmPayment(phone: string, code: string) {
+    const valid = this.twoFaService.validateCode(phone, code);
 
     if (!valid) {
-      throw new UnauthorizedException('Código inválido');
+      throw new UnauthorizedException('Código de verificación inválido');
     }
 
-    return { message: 'Pago realizado con éxito' };
+   
+    const userPayload = { 
+      phone: phone, 
+      scope: 'payment_verified',
+      date: new Date().toISOString() 
+    };
+
+   
+    const tokenData = await this.authService.login(userPayload);
+
+    return { 
+      message: 'Pago realizado con éxito',
+      access_token: tokenData.access_token 
+    };
   }
 }
