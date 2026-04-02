@@ -1,13 +1,23 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config'; 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
-import { TwofaModule } from './twofa/twofa.module';
+import { TwoFaModule } from './twofa/twofa.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, PaymentsModule, TwofaModule],
+  imports: [
+    
+    ConfigModule.forRoot({
+      isGlobal: true, 
+    }),
+    AuthModule, 
+    UsersModule, 
+    PaymentsModule, 
+    TwoFaModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

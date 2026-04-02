@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { TwofaService } from './twofa.service';
+import { TwoFaService } from './twofa.service';
 
 @Module({
-  providers: [TwofaService]
+  providers: [TwoFaService],
+  exports: [TwoFaService], 
 })
-export class TwofaModule {}
+export class TwoFaModule {}
