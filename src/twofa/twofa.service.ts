@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Twilio } from 'twilio';
 
 @Injectable()
@@ -7,36 +7,44 @@ export class TwoFaService {
   private client: Twilio;
 
   constructor() {
-    
-    this.client = new Twilio(
-      process.env.TWILIO_ACCOUNT_SID,
-      process.env.TWILIO_AUTH_TOKEN
-    );
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+    if (!accountSid || !authToken) {
+      console.error('Faltan las credenciales de Twilio en el .env');
+    }
+
+    this.client = new Twilio(accountSid, authToken);
   }
 
   async generateCode(phone: string): Promise<string> {
+    // Generar código de 6 dígitos
     const code = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Guardar temporalmente el código asociado al teléfono
     this.codes.set(phone, code);
 
     try {
       await this.client.messages.create({
-        body: `Tu código de pago es: ${code}`,
-        from: process.env.TWILIO_PHONE_NUMBER, 
+        body: `Tu código de seguridad para el sistema de Reservas es: ${code}`,
+        from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`, 
         to: `whatsapp:${phone}`, 
       });
 
-      console.log(`Código enviado a ${phone}: ${code}`);
+      console.log(`WhatsApp enviado a ${phone}: ${code}`);
+      return code;
     } catch (error) {
-      console.error(' Error enviando WhatsApp:', error.message);
-      throw error;
+      console.error('Error de Twilio:', error.message);
+      throw new InternalServerErrorException('No se pudo enviar el código de verificación.');
     }
-
-    return code;
   }
 
   validateCode(phone: string, code: string): boolean {
     const valid = this.codes.get(phone) === code;
-    if (valid) this.codes.delete(phone); 
+    
+    if (valid) {
+      this.codes.delete(phone);
+    } 
     return valid;
   }
 }
