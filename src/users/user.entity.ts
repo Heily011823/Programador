@@ -1,25 +1,34 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { Payment } from '../payments/payment.entity';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id!: number; 
+  id!: number;
 
-  @Column()
+  @Column({ type: 'varchar' }) 
   name!: string;
 
-  @Column({ unique: true })
-  phone!: string; 
+  @Column({ type: 'varchar', unique: true })
+  phone!: string;
 
-  @Column()
-  password!: string; 
+  @Column({ type: 'varchar' })
+  password!: string;
 
-  @Column({ nullable: true })
-  verificationCode?: string; 
+ 
+  @Column({ type: 'varchar', nullable: true })
+  verificationCode?: string | null; 
 
+  
   @Column({ type: 'timestamp', nullable: true })
-  codeExpiresAt?: Date; 
+  verificationCodeExpires?: Date | null; 
+
+  @Column({ default: false })
+  isVerified!: boolean;
+
+  @OneToMany(() => Payment, (payment) => payment.user)
+  payments!: Payment[];
 
   @CreateDateColumn()
-  createdAt!: Date; 
+  createdAt!: Date;
 }

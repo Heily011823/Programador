@@ -1,45 +1,57 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { TwoFaService } from '../twofa/twofa.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private authService: AuthService,
-    private twoFaService: TwoFaService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
-  @Post('login')
-  async login(@Body() body: { phone: string }) {
-    
-    const user = await this.authService.validateUser(body.phone);
+  
+  @Post('register')
+  async register(@Body() body: any) {
+    const { phone, password, name } = body;
 
-    if (!user) {
-      throw new UnauthorizedException('El número no está registrado en el sistema.');
+    if (!phone || !password || !name) {
+      throw new BadRequestException(
+        'Nombre, teléfono y contraseña son obligatorios',
+      );
     }
 
-    
-    await this.twoFaService.generateCode(body.phone);
-    
-    return { 
-      message: 'Código de inicio de sesión enviado a WhatsApp',
-      userName: user.name 
+    await this.authService.register(phone, password, name);
+
+    return {
+      message: 'Usuario registrado. Código de verificación enviado',
     };
   }
 
+  
   @Post('verify')
-  async verify(@Body() body: { phone: string; code: string }) {
-    
-    const isValid = this.twoFaService.validateCode(body.phone, body.code);
+  async verify(@Body() body: any) {
+    const { phone, code } = body;
 
-    if (!isValid) {
-      throw new UnauthorizedException('Código incorrecto o expirado');
+    if (!phone || !code) {
+      throw new BadRequestException(
+        'Teléfono y código son obligatorios',
+      );
     }
 
-    
-    const user = await this.authService.validateUser(body.phone);
+    await this.authService.verifyPhoneNumber(phone, code);
 
-   
-    return this.authService.login(user);
+    return {
+      message: 'Usuario verificado correctamente',
+    };
+  }
+
+ 
+  @Post('login')
+  async login(@Body() body: any) {
+    const { phone, password } = body;
+
+    if (!phone || !password) {
+      throw new BadRequestException(
+        'Teléfono y contraseña son obligatorios',
+      );
+    }
+
+    return await this.authService.login(phone, password);
   }
 }

@@ -9,7 +9,6 @@ describe('TwoFaService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TwoFaService,
-       
         {
           provide: ConfigService,
           useValue: {
@@ -27,7 +26,36 @@ describe('TwoFaService', () => {
     service = module.get<TwoFaService>(TwoFaService);
   });
 
-  it('should be defined', () => {
+  it('debería estar definido', () => {
     expect(service).toBeDefined();
+  });
+
+  
+  it('debería generar un código de 6 dígitos', () => {
+    const code = service.generateCode();
+
+    expect(code).toHaveLength(6);
+    expect(Number(code)).toBeGreaterThanOrEqual(0);
+  });
+
+  
+  it('debería validar correctamente un código', async () => {
+    const result = await service.validateCode('123456', '123456');
+
+    expect(result).toBe(true);
+  });
+
+  
+  it('debería rechazar un código incorrecto', async () => {
+    const result = await service.validateCode('123456', '000000');
+
+    expect(result).toBe(false);
+  });
+
+  
+  it('debería intentar enviar un código', async () => {
+    const result = await service.sendCode('123456789', '123456');
+
+    expect(result).toBeDefined();
   });
 });

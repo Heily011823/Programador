@@ -1,41 +1,75 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Payment } from './payment.entity';
 import { TwoFaService } from '../twofa/twofa.service';
-import { AuthService } from '../auth/auth.service'; 
 
 @Injectable()
 export class PaymentsService {
-  
   constructor(
+    @InjectRepository(Payment)
+    private paymentRepo: Repository<Payment>,
     private twoFaService: TwoFaService,
-    private authService: AuthService, 
   ) {}
 
-  requestPayment(phone: string) { 
-    this.twoFaService.generateCode(phone);
-    return { message: 'Código enviado para confirmar pago vía WhatsApp' };
+  //  Solicitar pago
+  async requestPayment(phone: string, amount: number) {
+    const code = this.twoFaService.generateCode();
+
+    const expires = new Date();
+    expires.setMinutes(expires.getMinutes() + 5);
+
+    const payment = this.paymentRepo.create({
+      phone,
+      amount,
+      code,
+      expiresAt: expires,
+      isConfirmed: false,
+    });
+
+    await this.paymentRepo.save(payment);
+
+    await this.twoFaService.sendCode(phone, code);
+
+    return {
+      message: 'Código enviado para confirmar el pago',
+    };
   }
 
-  
+  //  Confirmar pago
   async confirmPayment(phone: string, code: string) {
-    const valid = this.twoFaService.validateCode(phone, code);
+    const payment = await this.paymentRepo.findOne({
+      where: { phone, isConfirmed: false },
+      order: { id: 'DESC' }, // último pago
+    });
 
-    if (!valid) {
-      throw new UnauthorizedException('Código de verificación inválido');
+    if (!payment) {
+      throw new BadRequestException('No hay pago pendiente');
     }
 
-   
-    const userPayload = { 
-      phone: phone, 
-      scope: 'payment_verified',
-      date: new Date().toISOString() 
-    };
+    // validar expiración
+    if (new Date() > payment.expiresAt) {
+      throw new BadRequestException('El código ha expirado');
+    }
 
-   
-    const tokenData = await this.authService.login(userPayload);
+    const isValid = await this.twoFaService.validateCode(
+      payment.code,
+      code,
+    );
 
-    return { 
+    if (!isValid) {
+      throw new BadRequestException('Código inválido o expirado');
+    }
+
+    // confirmar pago
+    payment.isConfirmed = true;
+    await this.paymentRepo.save(payment);
+
+    return {
       message: 'Pago realizado con éxito',
-      access_token: tokenData.access_token 
+      transactionId: payment.id,
+      amount: payment.amount,
+      phone: payment.phone,
     };
   }
 }
