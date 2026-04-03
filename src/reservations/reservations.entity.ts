@@ -3,28 +3,27 @@ import { User } from '../users/user.entity';
 
 @Entity('reservations')
 export class Reservation {
-
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @ManyToOne(() => User)
-  user: User;
+  user!: User;
 
   @Column()
-  escenarioId: number;
+  escenarioId!: number;
 
   @Column()
-  fecha: string;
+  fecha!: string;
 
   @Column()
-  horaInicio: string;
+  horaInicio!: string;
 
   @Column()
-  horaFin: string;
+  horaFin!: string;
 
   @Column()
-  cantidadPersonas: number;
+  cantidadPersonas!: number;
 
   @Column({ default: 'activa' })
-  estado: string;
+  estado!: string;
 }
