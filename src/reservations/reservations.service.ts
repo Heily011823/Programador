@@ -40,7 +40,7 @@ export class ReservationService {
 
     // Crear la reserva
     const reservation = this.reservationRepository.create({
-      user, // TypeScript sabe que no es undefined
+      user, 
       escenarioId: dto.escenarioId,
       fecha: dto.fecha,
       horaInicio: dto.horaInicio,
