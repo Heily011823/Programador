@@ -41,10 +41,8 @@ describe('AuthController', () => {
     expect(controller).toBeDefined();
   });
 
-  
   it('debería registrar un usuario y enviar código de verificación', async () => {
     const dto = { email: 'test@test.com', password: '123456' };
-
     (authService.register as jest.Mock).mockResolvedValue({ id: 1, ...dto });
     (twoFaService.generateCode as jest.Mock).mockReturnValue('123456');
     (twoFaService.sendCode as jest.Mock).mockResolvedValue(true);
@@ -59,10 +57,8 @@ describe('AuthController', () => {
     });
   });
 
- 
   it('debería verificar el usuario con código correcto', async () => {
     const dto = { email: 'test@test.com', code: '123456' };
-
     (twoFaService.validateCode as jest.Mock).mockResolvedValue(true);
     (authService.verifyUser as jest.Mock).mockResolvedValue(true);
 
@@ -75,16 +71,13 @@ describe('AuthController', () => {
     });
   });
 
-/
   it('debería permitir login a usuario verificado', async () => {
     const dto = { email: 'test@test.com', password: '123456' };
-
     (authService.validateUser as jest.Mock).mockResolvedValue({
       id: 1,
       email: dto.email,
       isVerified: true,
     });
-
     (authService.login as jest.Mock).mockResolvedValue({
       access_token: 'jwt-token',
     });
@@ -96,18 +89,14 @@ describe('AuthController', () => {
     expect(result).toHaveProperty('access_token');
   });
 
-  
   it('NO debería permitir login a usuario no verificado', async () => {
     const dto = { email: 'test@test.com', password: '123456' };
-
     (authService.validateUser as jest.Mock).mockResolvedValue({
       id: 1,
       email: dto.email,
       isVerified: false,
     });
 
-    await expect(controller.login(dto)).rejects.toThrow(
-      'Usuario no verificado',
-    );
+    await expect(controller.login(dto)).rejects.toThrow('Usuario no verificado');
   });
 });
