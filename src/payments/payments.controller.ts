@@ -1,36 +1,42 @@
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException, UseGuards, Request } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('payments')
 export class PaymentsController {
   constructor(private paymentsService: PaymentsService) {}
 
+  // SOLO USUARIOS AUTENTICADOS
+  @UseGuards(AuthGuard('jwt'))
   @Post('request')
-<<<<<<< HEAD
-  request(@Body() body: { phone: string }) {
-=======
-  async request(@Body() body: { phone: string }) {
-  
-    if (!body.phone) {
-      throw new BadRequestException('El número de teléfono es obligatorio');
+  async request(
+    @Request() req,
+    @Body() body: { amount: number }
+  ) {
+    const { amount } = body;
+    const user = req.user;
+
+    if (!amount) {
+      throw new BadRequestException('El monto es obligatorio');
     }
-    
->>>>>>> feature/auth-users
-    return this.paymentsService.requestPayment(body.phone);
+
+    return this.paymentsService.requestPayment(user.phone, amount);
   }
 
+  //  SOLO AUTENTICADOS
+  @UseGuards(AuthGuard('jwt'))
   @Post('confirm')
-<<<<<<< HEAD
-  confirm(@Body() body: { phone: string; code: string }) {
-    return this.paymentsService.confirmPayment(body.phone, body.code);
-=======
-  async confirm(@Body() body: { phone: string; code: string }) {
-    
-    if (!body.phone || !body.code) {
-      throw new BadRequestException('Teléfono y código son obligatorios');
+  async confirm(
+    @Request() req,
+    @Body() body: { code: string }
+  ) {
+    const { code } = body;
+    const user = req.user;
+
+    if (!code) {
+      throw new BadRequestException('El código es obligatorio');
     }
 
-    return await this.paymentsService.confirmPayment(body.phone, body.code);
->>>>>>> feature/auth-users
+    return this.paymentsService.confirmPayment(user.phone, code);
   }
 }

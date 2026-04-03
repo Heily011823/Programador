@@ -3,48 +3,48 @@ import { Twilio } from 'twilio';
 
 @Injectable()
 export class TwoFaService {
-  private codes = new Map<string, string>();
   private client: Twilio;
 
   constructor() {
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
 
-    if (!accountSid || !authToken) {
-      console.error('Faltan las credenciales de Twilio en el .env');
-    }
-
     this.client = new Twilio(accountSid, authToken);
   }
 
-  async generateCode(phone: string): Promise<string> {
-    // Generar código de 6 dígitos
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    // Guardar temporalmente el código asociado al teléfono
-    this.codes.set(phone, code);
+  //  Generar código
+  generateCode(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
 
+  //  Enviar código
+  async sendCode(phone: string, code: string): Promise<void> {
     try {
       await this.client.messages.create({
-        body: `Tu código de seguridad para el sistema de Reservas es: ${code}`,
-        from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`, 
-        to: `whatsapp:${phone}`, 
+        body: `Tu código de verificación es: ${code}`,
+        from: `whatsapp:${process.env.TWILIO_PHONE_NUMBER}`,
+        to: `whatsapp:${phone}`,
       });
-
-      console.log(`WhatsApp enviado a ${phone}: ${code}`);
-      return code;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error de Twilio:', error.message);
-      throw new InternalServerErrorException('No se pudo enviar el código de verificación.');
+      throw new InternalServerErrorException(
+        'Error al enviar el mensaje de WhatsApp.',
+      );
     }
   }
 
-  validateCode(phone: string, code: string): boolean {
-    const valid = this.codes.get(phone) === code;
-    
-    if (valid) {
-      this.codes.delete(phone);
-    } 
-    return valid;
+  //  Validar código
+  async validateCode(
+    storedCode: string,
+    inputCode: string,
+  ): Promise<boolean> {
+    return storedCode === inputCode;
+  }
+
+  
+  async sendVerificationCode(phone: string): Promise<string> {
+    const code = this.generateCode();
+    await this.sendCode(phone, code);
+    return code;
   }
 }
