@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { 
+  Injectable, 
+  UnauthorizedException, 
+  BadRequestException, 
+  ConflictException 
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { TwoFaService } from '../twofa/twofa.service';
@@ -12,21 +17,28 @@ export class AuthService {
     private twoFaService: TwoFaService,
   ) {}
 
-  // REGISTRO
+  // --- REGISTRO ---
   async register(phone: string, pass: string, name: string) {
-    const hashedPassword = await bcrypt.hash(pass, 10);
+    // 1. Verificamos si el usuario ya existe antes de procesar nada
+    const existingUser = await this.usersService.findOneByPhone(phone);
+    
+    if (existingUser) {
+      throw new ConflictException('Este número de teléfono ya está registrado');
+    }
 
-    // Generar código
+    // 2. Si es nuevo, preparamos la seguridad
+    const hashedPassword = await bcrypt.hash(pass, 10);
     const code = this.twoFaService.generateCode();
 
-    //  Expira en 5 minutos
+    // 3. Definir expiración (5 minutos)
     const expires = new Date();
     expires.setMinutes(expires.getMinutes() + 5);
 
-    // Enviar código
+    // 4. Enviar el código por SMS/WhatsApp
+    // Al estar después del check de existencia, ahorras costos en mensajes fallidos
     await this.twoFaService.sendCode(phone, code);
 
-    // Crear usuario
+    // 5. Crear el registro en la base de datos
     const user = await this.usersService.create({
       phone,
       name,
@@ -42,7 +54,7 @@ export class AuthService {
     };
   }
 
-  // VERIFICACIÓN
+  // --- VERIFICACIÓN DEL CÓDIGO ---
   async verifyPhoneNumber(phone: string, code: string) {
     const user = await this.usersService.findOneByPhone(phone);
 
@@ -50,7 +62,7 @@ export class AuthService {
       throw new BadRequestException('Usuario no encontrado.');
     }
 
-    //  Validar expiración
+    // Validar si el código expiró
     if (
       !user.verificationCodeExpires ||
       new Date() > user.verificationCodeExpires
@@ -58,7 +70,7 @@ export class AuthService {
       throw new BadRequestException('El código ha expirado.');
     }
 
-    // Validar código con servicio 2FA
+    // Validar coincidencia del código
     const isValid = await this.twoFaService.validateCode(
       user.verificationCode!,
       code,
@@ -68,10 +80,8 @@ export class AuthService {
       throw new BadRequestException('Código de verificación incorrecto.');
     }
 
-    // Marcar como verificado
+    // Marcar como verificado y limpiar los campos de 2FA
     await this.usersService.markAsVerified(user.id);
-
-    // Limpiar código (importante)
     await this.usersService.update(user.id, {
       verificationCode: null,
       verificationCodeExpires: null,
@@ -82,7 +92,7 @@ export class AuthService {
     };
   }
 
-  // LOGIN
+  // --- INICIO DE SESIÓN ---
   async login(phone: string, pass: string) {
     const user = await this.usersService.findOneByPhone(phone);
 
@@ -90,7 +100,7 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales incorrectas.');
     }
 
-    // Bloquear si no está verificado
+    // Bloquear si el flujo de registro no terminó (verificación pendiente)
     if (!user.isVerified) {
       throw new UnauthorizedException(
         'Debes verificar tu número antes de entrar.',
