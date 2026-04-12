@@ -2,112 +2,102 @@ import {
   Injectable,
   UnauthorizedException,
   BadRequestException,
-  ConflictException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import { TwoFaService } from '../twofa/twofa.service';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { VerifyPhoneDto } from './dto/verify-phone.dto';
+import { TwilioService } from './twilio.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
-    private readonly twoFaService: TwoFaService,
+    private readonly jwtService: JwtService,
+    private readonly twilioService: TwilioService,
   ) {}
 
-  async register(phone: string, pass: string, name: string) {
-    const existingUser = await this.usersService.findOneByPhone(phone);
+  async register(data: RegisterDto) {
+    const existingUser = await this.usersService.findByPhone(data.phone);
 
     if (existingUser) {
-      throw new ConflictException('Este número de teléfono ya está registrado');
+      throw new BadRequestException('El número ya está registrado');
     }
 
-    const hashedPassword = await bcrypt.hash(pass, 10);
-    const code = this.twoFaService.generateCode();
-
-    const expires = new Date();
-    expires.setMinutes(expires.getMinutes() + 5);
-
-    await this.twoFaService.sendCode(phone, code);
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const verificationCode = Math.floor(
+      100000 + Math.random() * 900000,
+    ).toString();
 
     const user = await this.usersService.create({
-      phone,
-      name,
+      name: data.name,
+      phone: data.phone,
       password: hashedPassword,
-      verificationCode: code,
-      verificationCodeExpires: expires,
-      isVerified: false,
+      phoneVerified: false,
+      verificationCode,
     });
 
+    await this.twilioService.sendVerificationCode(user.phone, verificationCode);
+
     return {
-      message: 'Usuario registrado. Código de verificación enviado.',
+      message:
+        'Usuario registrado. Se envió un código de verificación por WhatsApp.',
       phone: user.phone,
     };
   }
 
-  async verifyPhoneNumber(phone: string, code: string) {
-    const user = await this.usersService.findOneByPhone(phone);
+  async verifyPhone(data: VerifyPhoneDto) {
+    const user = await this.usersService.findByPhone(data.phone);
 
     if (!user) {
-      throw new BadRequestException('Usuario no encontrado.');
+      throw new UnauthorizedException('Usuario no existe');
     }
 
-    if (
-      !user.verificationCodeExpires ||
-      new Date() > user.verificationCodeExpires
-    ) {
-      throw new BadRequestException('El código ha expirado.');
+    if (user.phoneVerified) {
+      throw new BadRequestException('El número ya fue verificado');
     }
 
-    const isValid = await this.twoFaService.validateCode(
-      user.verificationCode,
-      code,
-    );
-
-    if (!isValid) {
-      throw new BadRequestException('Código de verificación incorrecto.');
+    if (user.verificationCode !== data.code) {
+      throw new BadRequestException('Código inválido');
     }
 
-    await this.usersService.markAsVerified(user.id);
     await this.usersService.update(user.id, {
+      phoneVerified: true,
       verificationCode: null,
-      verificationCodeExpires: null,
     });
 
     return {
-      message: 'Número verificado exitosamente. Ya puedes iniciar sesión.',
+      message: 'Número verificado correctamente',
     };
   }
 
-  async login(phone: string, pass: string) {
-    const user = await this.usersService.findOneByPhone(phone);
+  async login(data: LoginDto) {
+    const user = await this.usersService.findByPhone(data.phone);
 
     if (!user) {
-      throw new UnauthorizedException('Credenciales incorrectas.');
+      throw new UnauthorizedException('Usuario no existe');
     }
 
-    if (!user.isVerified) {
-      throw new UnauthorizedException(
-        'Debes verificar tu número antes de entrar.',
-      );
-    }
-
-    const isMatch = await bcrypt.compare(pass, user.password);
+    const isMatch = await bcrypt.compare(data.password, user.password);
 
     if (!isMatch) {
-      throw new UnauthorizedException('Credenciales incorrectas.');
+      throw new UnauthorizedException('Contraseña incorrecta');
+    }
+
+    if (!user.phoneVerified) {
+      throw new UnauthorizedException(
+        'Debes verificar tu número antes de iniciar sesión',
+      );
     }
 
     const payload = {
       sub: user.id,
       phone: user.phone,
-      name: user.name,
     };
 
     return {
-      message: 'Login exitoso',
       access_token: this.jwtService.sign(payload),
     };
   }

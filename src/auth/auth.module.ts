@@ -1,21 +1,21 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
-import { TwoFaModule } from '../twofa/twofa.module';
+import { TwilioService } from './twilio.service';
 
 @Module({
   imports: [
     UsersModule,
-    TwoFaModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1h' },
+      secret: process.env.JWT_SECRET || 'secreto_super_seguro',
+      signOptions: { expiresIn: '5m' },
     }),
   ],
-  providers: [AuthService],
   controllers: [AuthController],
-  exports: [AuthService, JwtModule],
+  providers: [AuthService, TwilioService],
+  exports: [AuthService],
 })
 export class AuthModule {}
