@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
-<<<<<<< HEAD
-import { JwtModule } from '@nestjs/jwt';
 import { TwoFaModule } from '../twofa/twofa.module';
 
 @Module({
@@ -11,26 +10,12 @@ import { TwoFaModule } from '../twofa/twofa.module';
     UsersModule,
     TwoFaModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET, 
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
   ],
   providers: [AuthService],
   controllers: [AuthController],
-  exports: [AuthService, JwtModule], 
-=======
-
-import { JwtModule } from '@nestjs/jwt';
-
-@Module({
-  imports: [
-    JwtModule.register({
-      secret: 'secreto_super_seguro',
-      signOptions: { expiresIn: '5m' }, 
-    }),
-  ],
-  controllers: [AuthController],
-  providers: [AuthService],
->>>>>>> feature/auth
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
