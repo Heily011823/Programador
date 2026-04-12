@@ -5,7 +5,6 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  
   @Post('register')
   async register(@Body() body: any) {
     const { phone, password, name } = body;
@@ -23,7 +22,6 @@ export class AuthController {
     };
   }
 
-  
   @Post('verify')
   async verify(@Body() body: any) {
     const { phone, code } = body;
@@ -41,7 +39,6 @@ export class AuthController {
     };
   }
 
- 
   @Post('login')
   async login(@Body() body: any) {
     const { phone, password } = body;

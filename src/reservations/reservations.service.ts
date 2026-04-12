@@ -1,7 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {Injectable, NotFoundException, BadRequestException, } from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, LessThan, MoreThan } from 'typeorm';
+
 import { Reservation } from './reservations.entity';
-import { Repository } from 'typeorm';
 import { User } from '../users/user.entity';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
@@ -16,46 +18,89 @@ export class ReservationService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  // Obtener todas las reservas
   async findAll(): Promise<Reservation[]> {
     return this.reservationRepository.find();
   }
 
-  // Obtener una reserva por id
   async findOne(id: number): Promise<Reservation> {
     const reservation = await this.reservationRepository.findOne({ where: { id } });
+
     if (!reservation) {
-      throw new NotFoundException(`Reserva con id ${id} no encontrada`);
+      throw new NotFoundException('Reserva no encontrada');
     }
+
     return reservation;
   }
 
-  // Crear una nueva reserva
   async create(dto: CreateReservationDto): Promise<Reservation> {
-    // Validar que el usuario exista
     const user = await this.userRepository.findOne({ where: { id: dto.userId } });
+
     if (!user) {
-      throw new NotFoundException(`Usuario con id ${dto.userId} no encontrado`);
+      throw new NotFoundException('Usuario no encontrado');
     }
 
-    // Crear la reserva
+    if (dto.endTime <= dto.startTime) {
+      throw new BadRequestException('La hora fin debe ser mayor a la hora inicio');
+    }
+
+    const overlap = await this.reservationRepository.findOne({
+      where: {
+        scenarioId: dto.scenarioId,
+        date: dto.date,
+        startTime: LessThan(dto.endTime),
+        endTime: MoreThan(dto.startTime),
+      },
+    });
+
+    if (overlap) {
+      throw new BadRequestException('Ya existe una reserva en ese horario');
+    }
+
     const reservation = this.reservationRepository.create({
-      user, 
-      escenarioId: dto.escenarioId,
-      fecha: dto.fecha,
-      horaInicio: dto.horaInicio,
-      horaFin: dto.horaFin,
-      cantidadPersonas: dto.cantidadPersonas,
+      user,
+      scenarioId: dto.scenarioId,
+      date: dto.date,
+      startTime: dto.startTime,
+      endTime: dto.endTime,
+      peopleCount: dto.peopleCount,
     });
 
     return this.reservationRepository.save(reservation);
   }
 
-  // Actualizar una reserva existente
   async update(id: number, dto: UpdateReservationDto): Promise<Reservation> {
-    const reservation = await this.reservationRepository.findOne({ where: { id } });
-    if (!reservation) {
-      throw new NotFoundException(`Reserva con id ${id} no encontrada`);
+    const reservation = await this.findOne(id);
+
+    const startTime = dto.startTime ?? reservation.startTime;
+    const endTime = dto.endTime ?? reservation.endTime;
+    const date = dto.date ?? reservation.date;
+    const scenarioId = dto.scenarioId ?? reservation.scenarioId;
+
+    if (endTime <= startTime) {
+      throw new BadRequestException('La hora fin debe ser mayor a la hora inicio');
+    }
+
+    const overlap = await this.reservationRepository.findOne({
+      where: {
+        scenarioId,
+        date,
+        startTime: LessThan(endTime),
+        endTime: MoreThan(startTime),
+      },
+    });
+
+    if (overlap && overlap.id !== id) {
+      throw new BadRequestException('Conflicto de horario');
+    }
+
+    if (dto.userId) {
+      const user = await this.userRepository.findOne({ where: { id: dto.userId } });
+
+      if (!user) {
+        throw new NotFoundException('Usuario no encontrado');
+      }
+
+      reservation.user = user;
     }
 
     Object.assign(reservation, dto);
@@ -63,13 +108,11 @@ export class ReservationService {
     return this.reservationRepository.save(reservation);
   }
 
-  // Eliminar una reserva
   async remove(id: number): Promise<void> {
-    const reservation = await this.reservationRepository.findOne({ where: { id } });
-    if (!reservation) {
-      throw new NotFoundException(`Reserva con id ${id} no encontrada`);
-    }
+    const result = await this.reservationRepository.delete(id);
 
-    await this.reservationRepository.remove(reservation);
+    if (result.affected === 0) {
+      throw new NotFoundException('Reserva no encontrada');
+    }
   }
 }

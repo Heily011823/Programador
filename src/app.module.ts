@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
 import { TwoFaModule } from './twofa/twofa.module';
+import { ReservationModule } from './reservations/reservations.module';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { TwoFaModule } from './twofa/twofa.module';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: '#Septiembre18.', 
+      password: 'Cataratas202420.', 
       database: 'programador', 
       autoLoadEntities: true, 
       synchronize: true, 
@@ -30,7 +31,8 @@ import { TwoFaModule } from './twofa/twofa.module';
     AuthModule, 
     UsersModule, 
     PaymentsModule, 
-    TwoFaModule
+    TwoFaModule,
+    ReservationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

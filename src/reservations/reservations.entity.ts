@@ -1,4 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+} from 'typeorm';
 import { User } from '../users/user.entity';
 
 @Entity('reservations')
@@ -6,24 +11,24 @@ export class Reservation {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { eager: true })
   user!: User;
 
-  @Column()
-  escenarioId!: number;
+  @Column({ type: 'int' })
+  scenarioId!: number;
 
-  @Column()
-  fecha!: string;
+  @Column({ type: 'date' })
+  date!: string;
 
-  @Column()
-  horaInicio!: string;
+  @Column({ type: 'time' })
+  startTime!: string;
 
-  @Column()
-  horaFin!: string;
+  @Column({ type: 'time' })
+  endTime!: string;
 
-  @Column()
-  cantidadPersonas!: number;
+  @Column({ type: 'int' })
+  peopleCount!: number;
 
-  @Column({ default: 'activa' })
-  estado!: string;
+  @Column({ default: 'ACTIVA' })
+  status!: string;
 }

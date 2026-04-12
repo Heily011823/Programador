@@ -1,12 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { BadRequestException } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { TwoFaService } from '../twofa/twofa.service';
 
 describe('AuthController', () => {
   let controller: AuthController;
   let authService: AuthService;
-  let twoFaService: TwoFaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -16,17 +15,8 @@ describe('AuthController', () => {
           provide: AuthService,
           useValue: {
             register: jest.fn(),
-            validateUser: jest.fn(),
+            verifyPhoneNumber: jest.fn(),
             login: jest.fn(),
-            verifyUser: jest.fn(),
-          },
-        },
-        {
-          provide: TwoFaService,
-          useValue: {
-            generateCode: jest.fn(),
-            sendCode: jest.fn(),
-            validateCode: jest.fn(),
           },
         },
       ],
@@ -34,80 +24,116 @@ describe('AuthController', () => {
 
     controller = module.get<AuthController>(AuthController);
     authService = module.get<AuthService>(AuthService);
-    twoFaService = module.get<TwoFaService>(TwoFaService);
   });
 
   it('debería estar definido', () => {
     expect(controller).toBeDefined();
   });
 
-  
-  it('debería registrar un usuario y enviar código de verificación', async () => {
-    const dto = { email: 'test@test.com', password: '123456' };
+  describe('register', () => {
+    it('debería registrar un usuario correctamente', async () => {
+      const body = {
+        phone: '3001234567',
+        password: '123456',
+        name: 'Heily',
+      };
 
-    (authService.register as jest.Mock).mockResolvedValue({ id: 1, ...dto });
-    (twoFaService.generateCode as jest.Mock).mockReturnValue('123456');
-    (twoFaService.sendCode as jest.Mock).mockResolvedValue(true);
+      (authService.register as jest.Mock).mockResolvedValue(undefined);
 
-    const result = await controller.register(dto);
+      const result = await controller.register(body);
 
-    expect(authService.register).toHaveBeenCalledWith(dto);
-    expect(twoFaService.generateCode).toHaveBeenCalled();
-    expect(twoFaService.sendCode).toHaveBeenCalled();
-    expect(result).toEqual({
-      message: 'Usuario registrado. Código de verificación enviado',
+      expect(authService.register).toHaveBeenCalledWith(
+        body.phone,
+        body.password,
+        body.name,
+      );
+
+      expect(result).toEqual({
+        message: 'Usuario registrado. Código de verificación enviado',
+      });
+    });
+
+    it('debería lanzar error si faltan campos', async () => {
+      const body = {
+        phone: '3001234567',
+        password: '123456',
+      };
+
+      await expect(controller.register(body as any)).rejects.toThrow(
+        BadRequestException,
+      );
+
+      expect(authService.register).not.toHaveBeenCalled();
     });
   });
 
- 
-  it('debería verificar el usuario con código correcto', async () => {
-    const dto = { email: 'test@test.com', code: '123456' };
+  describe('verify', () => {
+    it('debería verificar un usuario correctamente', async () => {
+      const body = {
+        phone: '3001234567',
+        code: '123456',
+      };
 
-    (twoFaService.validateCode as jest.Mock).mockResolvedValue(true);
-    (authService.verifyUser as jest.Mock).mockResolvedValue(true);
+      (authService.verifyPhoneNumber as jest.Mock).mockResolvedValue(undefined);
 
-    const result = await controller.verify(dto);
+      const result = await controller.verify(body);
 
-    expect(twoFaService.validateCode).toHaveBeenCalledWith(dto.email, dto.code);
-    expect(authService.verifyUser).toHaveBeenCalledWith(dto.email);
-    expect(result).toEqual({
-      message: 'Usuario verificado correctamente',
+      expect(authService.verifyPhoneNumber).toHaveBeenCalledWith(
+        body.phone,
+        body.code,
+      );
+
+      expect(result).toEqual({
+        message: 'Usuario verificado correctamente',
+      });
+    });
+
+    it('debería lanzar error si faltan phone o code', async () => {
+      const body = {
+        phone: '3001234567',
+      };
+
+      await expect(controller.verify(body as any)).rejects.toThrow(
+        BadRequestException,
+      );
+
+      expect(authService.verifyPhoneNumber).not.toHaveBeenCalled();
     });
   });
 
-/
-  it('debería permitir login a usuario verificado', async () => {
-    const dto = { email: 'test@test.com', password: '123456' };
+  describe('login', () => {
+    it('debería hacer login correctamente', async () => {
+      const body = {
+        phone: '3001234567',
+        password: '123456',
+      };
 
-    (authService.validateUser as jest.Mock).mockResolvedValue({
-      id: 1,
-      email: dto.email,
-      isVerified: true,
+      const mockLoginResponse = {
+        access_token: 'jwt-token',
+      };
+
+      (authService.login as jest.Mock).mockResolvedValue(mockLoginResponse);
+
+      const result = await controller.login(body);
+
+      expect(authService.login).toHaveBeenCalledWith(
+        body.phone,
+        body.password,
+      );
+
+      expect(result).toEqual(mockLoginResponse);
     });
 
-    (authService.login as jest.Mock).mockResolvedValue({
-      access_token: 'jwt-token',
+    it('debería lanzar error si faltan phone o password', async () => {
+      const body = {
+        phone: '3001234567',
+      };
+
+      await expect(controller.login(body as any)).rejects.toThrow(
+        BadRequestException,
+      );
+
+      expect(authService.login).not.toHaveBeenCalled();
     });
-
-    const result = await controller.login(dto);
-
-    expect(authService.validateUser).toHaveBeenCalledWith(dto.email, dto.password);
-    expect(authService.login).toHaveBeenCalled();
-    expect(result).toHaveProperty('access_token');
-  });
-
-  
-  it('NO debería permitir login a usuario no verificado', async () => {
-    const dto = { email: 'test@test.com', password: '123456' };
-
-    (authService.validateUser as jest.Mock).mockResolvedValue({
-      id: 1,
-      email: dto.email,
-      isVerified: false,
-    });
-
-    await expect(controller.login(dto)).rejects.toThrow(
-      'Usuario no verificado',
-    );
   });
 });
