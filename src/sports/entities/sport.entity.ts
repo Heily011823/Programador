@@ -1,12 +1,10 @@
 import {
+  Column,
+  CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Scenario } from '../../scenarios/entities/scenario.entity';
 
 @Entity('sports')
 export class Sport {
@@ -32,12 +30,15 @@ export class Sport {
   })
   maxPlayers?: number;
 
-  @OneToMany(() => Scenario, (scenario) => scenario.sport)
-  scenarios: Scenario[];
-
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({
+    type: 'boolean',
+    default: true,
+  })
+  isActive: boolean;
 }
