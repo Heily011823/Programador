@@ -1,0 +1,40 @@
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query,
+} from '@nestjs/common';
+import { ScenariosService } from './scenarios.service';
+import { CreateScenarioDto } from './dto/create-scenario.dto';
+import { UpdateScenarioDto } from './dto/update-scenario.dto';
+import { QueryScenarioDto } from './dto/read-scenario.dto';
+
+@Controller('scenarios')
+export class ScenariosController {
+  constructor(private readonly scenariosService: ScenariosService) {}
+
+  @Post()
+  create(@Body() createScenarioDto: CreateScenarioDto) {
+    return this.scenariosService.create(createScenarioDto);
+  }
+
+  @Get()
+  findAll(@Query() query: QueryScenarioDto) {
+    return this.scenariosService.findAll(query);
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.scenariosService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateScenarioDto: UpdateScenarioDto,
+  ) {
+    return this.scenariosService.update(id, updateScenarioDto);
+  }
+
+
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.scenariosService.remove(id);
+  }
+}
