@@ -14,16 +14,17 @@ import { ScenariosService } from './scenarios.service';
 import { CreateScenarioDto } from './dto/create-scenario.dto';
 import { UpdateScenarioDto } from './dto/update-scenario.dto';
 import { QueryScenarioDto } from './dto/read-scenario.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles/roles.guard';
 import { Roles } from '../auth/roles/roles.decorator';
+import { UserRole } from '../users/entities/user.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('scenarios')
 export class ScenariosController {
   constructor(private readonly scenariosService: ScenariosService) {}
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
- @Roles('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post()
   create(@Body() createScenarioDto: CreateScenarioDto) {
     return this.scenariosService.create(createScenarioDto);
@@ -39,8 +40,8 @@ export class ScenariosController {
     return this.scenariosService.findOne(id);
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('ADMIN')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -49,8 +50,8 @@ export class ScenariosController {
     return this.scenariosService.update(id, updateScenarioDto);
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('ADMIN')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.scenariosService.remove(id);

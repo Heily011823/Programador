@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Payment } from '../../payments/payment.entity';
 
 export enum UserRole {
@@ -15,36 +9,30 @@ export enum UserRole {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
-  @Column({ type: 'varchar' })
-  name!: string;
+  @Column()
+  name: string;
 
-  @Column({ type: 'varchar', unique: true })
-  phone!: string;
+  @Column({ unique: true })
+  phone: string;
 
-  @Column({ type: 'varchar' })
-  password!: string;
-
-  @Column({ type: 'varchar', nullable: true })
-  verificationCode?: string | null;
-
-  @Column({ type: 'timestamp', nullable: true })
-  verificationCodeExpires?: Date | null;
+  @Column()
+  password: string;
 
   @Column({ default: false })
-  isVerified!: boolean;
+  isVerified: boolean;
+
+  @Column({ nullable: true })
+  verificationCode: string | null;
 
   @Column({
     type: 'enum',
     enum: UserRole,
     default: UserRole.CLIENT,
   })
-  role!: UserRole;
+  role: UserRole;
 
   @OneToMany(() => Payment, (payment) => payment.user)
-  payments!: Payment[];
-
-  @CreateDateColumn()
-  createdAt!: Date;
+  payments: Payment[];
 }

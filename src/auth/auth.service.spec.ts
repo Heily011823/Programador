@@ -1,112 +1,255 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
+import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+
+import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
-import { TwoFaService } from '../twofa/twofa.service';
-import { UnauthorizedException } from '@nestjs/common';
+import { TwilioService } from './twilio.service';
+import { UserRole } from '../users/entities/user.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
   let usersService: UsersService;
-  let twoFaService: TwoFaService;
+  let twilioService: TwilioService;
   let jwtService: JwtService;
+
+  const mockUsersService = {
+    create: jest.fn(),
+    findByPhone: jest.fn(),
+    update: jest.fn(),
+    findById: jest.fn(),
+  };
+
+  const mockJwtService = {
+    sign: jest.fn().mockReturnValue('token_de_prueba'),
+  };
+
+  const mockTwilioService = {
+    sendVerificationCode: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         {
-          provide: JwtService,
-          useValue: {
-            sign: jest.fn().mockReturnValue('token_de_prueba'),
-          },
-        },
-        {
           provide: UsersService,
-          useValue: {
-            create: jest.fn(),
-            findOneByPhone: jest.fn(),
-            update: jest.fn(),
-          },
+          useValue: mockUsersService,
         },
         {
-          provide: TwoFaService,
-          useValue: {
-            generateCode: jest.fn(),
-            sendCode: jest.fn(),
-            validateCode: jest.fn(),
-          },
+          provide: JwtService,
+          useValue: mockJwtService,
+        },
+        {
+          provide: TwilioService,
+          useValue: mockTwilioService,
         },
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
     usersService = module.get<UsersService>(UsersService);
-    twoFaService = module.get<TwoFaService>(TwoFaService);
     jwtService = module.get<JwtService>(JwtService);
+    twilioService = module.get<TwilioService>(TwilioService);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('debería estar definido', () => {
     expect(service).toBeDefined();
   });
 
-  
   it('debería registrar usuario y enviar código', async () => {
-    (usersService.create as jest.Mock).mockResolvedValue({
+    mockUsersService.findByPhone.mockResolvedValue(null);
+    mockUsersService.create.mockResolvedValue({
       id: 1,
-      phone: '123',
+      name: 'Heily',
+      phone: '1234567890',
       isVerified: false,
+      role: UserRole.CLIENT,
+    });
+    mockTwilioService.sendVerificationCode.mockResolvedValue({
+      message: 'Código enviado por WhatsApp',
     });
 
-    (twoFaService.generateCode as jest.Mock).mockReturnValue('123456');
-    (twoFaService.sendCode as jest.Mock).mockResolvedValue(true);
+    const result = await service.register({
+      name: 'Heily',
+      phone: '1234567890',
+      password: '123456',
+    });
 
-    const result = await service.register('123', 'pass', 'Heily');
-
+    expect(usersService.findByPhone).toHaveBeenCalledWith('1234567890');
     expect(usersService.create).toHaveBeenCalled();
-    expect(twoFaService.generateCode).toHaveBeenCalled();
-    expect(twoFaService.sendCode).toHaveBeenCalledWith('123', '123456');
-  });
-
-  
-  it('debería verificar usuario correctamente', async () => {
-    (twoFaService.validateCode as jest.Mock).mockResolvedValue(true);
-    (usersService.update as jest.Mock).mockResolvedValue(true);
-
-    const result = await service.verifyPhoneNumber('123', '123456');
-
-    expect(twoFaService.validateCode).toHaveBeenCalledWith('123', '123456');
-    expect(usersService.update).toHaveBeenCalledWith('123', {
-      isVerified: true,
+    expect(twilioService.sendVerificationCode).toHaveBeenCalled();
+    expect(result).toEqual({
+      message:
+        'Usuario registrado. Se envió un código de verificación por WhatsApp.',
+      phone: '1234567890',
     });
   });
 
- 
-  it('debería hacer login si está verificado', async () => {
-    (usersService.findOneByPhone as jest.Mock).mockResolvedValue({
+  it('no debería registrar si el número ya existe', async () => {
+    mockUsersService.findByPhone.mockResolvedValue({
       id: 1,
-      phone: '123',
-      password: 'pass',
-      isVerified: true,
+      phone: '1234567890',
     });
 
-    const result = await service.login('123', 'pass');
-
-    expect(jwtService.sign).toHaveBeenCalled();
-    expect(result).toEqual({ access_token: 'token_de_prueba' });
+    await expect(
+      service.register({
+        name: 'Heily',
+        phone: '1234567890',
+        password: '123456',
+      }),
+    ).rejects.toThrow(
+      new BadRequestException('El número ya está registrado'),
+    );
   });
 
-  
-  it('NO debería permitir login si no está verificado', async () => {
-    (usersService.findOneByPhone as jest.Mock).mockResolvedValue({
+  it('debería verificar número correctamente', async () => {
+    mockUsersService.findByPhone.mockResolvedValue({
       id: 1,
-      phone: '123',
-      password: 'pass',
+      phone: '1234567890',
       isVerified: false,
+      verificationCode: '123456',
     });
 
-    await expect(service.login('123', 'pass')).rejects.toThrow(
-      new UnauthorizedException('Usuario no verificado'),
+    mockUsersService.update.mockResolvedValue({
+      id: 1,
+      isVerified: true,
+      verificationCode: null,
+    });
+
+    const result = await service.verifyPhone({
+      phone: '1234567890',
+      code: '123456',
+    });
+
+    expect(usersService.findByPhone).toHaveBeenCalledWith('1234567890');
+    expect(usersService.update).toHaveBeenCalledWith(1, {
+      isVerified: true,
+      verificationCode: null,
+    });
+    expect(result).toEqual({
+      message: 'Número verificado correctamente',
+    });
+  });
+
+  it('no debería verificar si el usuario no existe', async () => {
+    mockUsersService.findByPhone.mockResolvedValue(null);
+
+    await expect(
+      service.verifyPhone({
+        phone: '1234567890',
+        code: '123456',
+      }),
+    ).rejects.toThrow(new UnauthorizedException('Usuario no existe'));
+  });
+
+  it('no debería verificar si el código es inválido', async () => {
+    mockUsersService.findByPhone.mockResolvedValue({
+      id: 1,
+      phone: '1234567890',
+      isVerified: false,
+      verificationCode: '654321',
+    });
+
+    await expect(
+      service.verifyPhone({
+        phone: '1234567890',
+        code: '123456',
+      }),
+    ).rejects.toThrow(new BadRequestException('Código inválido'));
+  });
+
+  it('debería hacer login si el usuario está verificado', async () => {
+    const hashedPassword = await bcrypt.hash('123456', 10);
+
+    mockUsersService.findByPhone.mockResolvedValue({
+      id: 1,
+      name: 'Heily',
+      phone: '1234567890',
+      password: hashedPassword,
+      isVerified: true,
+      role: UserRole.ADMIN,
+    });
+
+    const result = await service.login({
+      phone: '1234567890',
+      password: '123456',
+    });
+
+    expect(usersService.findByPhone).toHaveBeenCalledWith('1234567890');
+    expect(jwtService.sign).toHaveBeenCalledWith({
+      sub: 1,
+      phone: '1234567890',
+      role: UserRole.ADMIN,
+    });
+    expect(result).toEqual({
+      access_token: 'token_de_prueba',
+      user: {
+        id: 1,
+        name: 'Heily',
+        phone: '1234567890',
+        role: UserRole.ADMIN,
+      },
+    });
+  });
+
+  it('no debería permitir login si el usuario no existe', async () => {
+    mockUsersService.findByPhone.mockResolvedValue(null);
+
+    await expect(
+      service.login({
+        phone: '1234567890',
+        password: '123456',
+      }),
+    ).rejects.toThrow(new UnauthorizedException('Usuario no existe'));
+  });
+
+  it('no debería permitir login si la contraseña es incorrecta', async () => {
+    const hashedPassword = await bcrypt.hash('otra-clave', 10);
+
+    mockUsersService.findByPhone.mockResolvedValue({
+      id: 1,
+      name: 'Heily',
+      phone: '1234567890',
+      password: hashedPassword,
+      isVerified: true,
+      role: UserRole.CLIENT,
+    });
+
+    await expect(
+      service.login({
+        phone: '1234567890',
+        password: '123456',
+      }),
+    ).rejects.toThrow(new UnauthorizedException('Contraseña incorrecta'));
+  });
+
+  it('no debería permitir login si el usuario no está verificado', async () => {
+    const hashedPassword = await bcrypt.hash('123456', 10);
+
+    mockUsersService.findByPhone.mockResolvedValue({
+      id: 1,
+      name: 'Heily',
+      phone: '1234567890',
+      password: hashedPassword,
+      isVerified: false,
+      role: UserRole.CLIENT,
+    });
+
+    await expect(
+      service.login({
+        phone: '1234567890',
+        password: '123456',
+      }),
+    ).rejects.toThrow(
+      new UnauthorizedException(
+        'Debes verificar tu número antes de iniciar sesión',
+      ),
     );
   });
 });

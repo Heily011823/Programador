@@ -1,23 +1,1988 @@
 {
   "info": {
-    "_postman_id": "4a774c77-62a2-448a-8e54-d22bf0b9d9c6",
+    "_postman_id": "9938042a-489c-4ed0-a152-48d6aa6775a4",
     "name": "Sport-Reservations-API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "52172785",
-    "_collection_link": "https://go.postman.co/collection/52172785-4a774c77-62a2-448a-8e54-d22bf0b9d9c6?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/52172785-9938042a-489c-4ed0-a152-48d6aa6775a4?source=collection_link"
   },
   "item": [
     {
       "name": "01 - Users",
       "item": [
         {
-          "name": "1. Registrar usuario",
+          "name": "Create User",
           "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"name\": \"Heily\",\r\n  \"phone\": \"+573244634115\",\r\n  \"password\": \"123456\"\r\n}",
+              "raw": "{\r\n  \"name\": \"Elizabeth\",\r\n  \"phone\": \"+573024594386\",\r\n  \"password\": \"12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "400- Nombre letras error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"8998\",\r\n  \"phone\": \"+573024594386\",\r\n  \"password\": \"12345678\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/auth/register",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "90"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"5a-bSeMKhA+FJgleSLbe6Jyp4p5Ryo\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 14:35:38 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": [\n        \"El nombre solo debe contener letras\"\n    ],\n    \"error\": \"Bad Request\",\n    \"statusCode\": 400\n}"
+            },
+            {
+              "name": "201-Creado",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Elizabeth\",\r\n  \"phone\": \"+573024594386\",\r\n  \"password\": \"12345678\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/auth/register",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "109"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"6d-7trJ21SW2Mpx+fy8Pb2azSfqX28\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 14:37:04 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Usuario registrado. Se envió un código de verificación por WhatsApp.\",\n    \"phone\": \"+573024594386\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsInBob25lIjoiKzU3MzI0NDYzNDExNSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NjA4Mzc2MSwiZXhwIjoxNzc2MTcwMTYxfQ.xkh79q_cC02Yazl5EWOcGzIcBOHGKV8RFD-Uu9AlFjI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "403- No tiene permisos",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/users",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "users"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "82"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"52-pEgwOFinXM02zARGi+nybTGfhlc\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 12:32:29 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"No tienes permisos para acceder\",\n    \"error\": \"Forbidden\",\n    \"statusCode\": 403\n}"
+            },
+            {
+              "name": "200-exitosa",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/users",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "users"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "169"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"a9-Xmk3g2BnjD773u+3/sCxEEYY0qs\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 12:37:58 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n    {\n        \"id\": 7,\n        \"name\": \"admin\",\n        \"phone\": \"+573244634115\",\n        \"isVerified\": true,\n        \"role\": \"admin\"\n    },\n    {\n        \"id\": 8,\n        \"name\": \"Heily Rios\",\n        \"phone\": \"+573173999093\",\n        \"isVerified\": true,\n        \"role\": \"client\"\n    }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get User by Phone",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsInBob25lIjoiKzU3MzI0NDYzNDExNSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NjA4Mzc2MSwiZXhwIjoxNzc2MTcwMTYxfQ.xkh79q_cC02Yazl5EWOcGzIcBOHGKV8RFD-Uu9AlFjI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/users/+573244634115",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "users",
+                "+573244634115"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "403-No tiene permisos",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/users/+573244634115",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "users",
+                    "+573244634115"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "82"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"52-pEgwOFinXM02zARGi+nybTGfhlc\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 12:35:11 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"No tienes permisos para acceder\",\n    \"error\": \"Forbidden\",\n    \"statusCode\": 403\n}"
+            },
+            {
+              "name": "200- exitosa",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/users/+573244634115",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "users",
+                    "+573244634115"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "80"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"50-cBaGjSPMhiAdIe2WTlciPLq2LgU\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 12:36:56 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"id\": 7,\n    \"name\": \"admin\",\n    \"phone\": \"+573244634115\",\n    \"isVerified\": true,\n    \"role\": \"admin\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Verify-phone",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"phone\": \"+573165768610\",\r\n  \"code\": \"740027\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/auth/verify-phone",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "verify-phone"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "201- verificado",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"phone\": \"+573244634115\",\r\n  \"code\": \"752983\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/auth/verify",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "auth",
+                    "verify"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "46"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"2e-jjCOZf9YuOBYduaIw8A/3YZwKes\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 03 Apr 2026 16:54:52 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"message\": \"Usuario verificado correctamente\"\n}"
+            },
+            {
+              "name": "400-codigo expirado",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"phone\": \"+573244634115\",\r\n  \"code\": \"419108\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/auth/verify",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "auth",
+                    "verify"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "76"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"4c-exYcjNzx/Hw+KR6ft1P6EBYpKsY\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 03 Apr 2026 16:55:24 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"El código ha expirado.\",\n    \"error\": \"Bad Request\",\n    \"statusCode\": 400\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"phone\": \"+573165768610\",\r\n  \"password\": \"12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "201-Login exitoso",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"phone\": \"+573173999093\",\r\n  \"password\": \"18092006\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/auth/login",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "287"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"11f-ufCYcX5qp0FOFajjVZCSjan1E68\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 12:15:17 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjgsInBob25lIjoiKzU3MzE3Mzk5OTA5MyIsInJvbGUiOiJjbGllbnQiLCJpYXQiOjE3NzYwODI1MTcsImV4cCI6MTc3NjE2ODkxN30.yNo03G14Gm6XAYERJGs1fwkQLIZNKYFyRpjgxL8APUM\",\n    \"user\": {\n        \"id\": 8,\n        \"name\": \"Heily Rios\",\n        \"phone\": \"+573173999093\",\n        \"role\": \"client\"\n    }\n}"
+            },
+            {
+              "name": "401-contraseña incorrecta",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"phone\": \"+573173999093\",\r\n  \"password\": \"18092007\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/auth/login",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "76"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"4c-3Bgz8VeCfDV8YoZwQ1JfRwwdnzQ\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 12:15:45 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Contraseña incorrecta\",\n    \"error\": \"Unauthorized\",\n    \"statusCode\": 401\n}"
+            }
+          ]
+        },
+        {
+          "name": "Me",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE2LCJwaG9uZSI6Iis1NzMxNjU3Njg2MTAiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzc2MDg5MjY4LCJleHAiOjE3NzYxNzU2Njh9.Crwk42JB4sNIqHlJ340Sm3r40PlqLl_7Iw1ZHF8xG3E",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/users/profile/me",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "users",
+                "profile",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Payments",
+      "item": [
+        {
+          "name": "Payment - Request OTP",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE2LCJwaG9uZSI6Iis1NzMxNjU3Njg2MTAiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzc2MDg5Nzc2LCJleHAiOjE3NzYxNzYxNzZ9.Rh-yS5Cf1bqpgjwudHhpas7Scll5nzDmkakJXGhJ_ng",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"reservationId\": 1,\r\n  \"amount\": 500000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/payments/request",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "payments",
+                "request"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "201-Create",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"reservationId\": 1,\r\n  \"amount\": 500000\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/payments/request",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "payments",
+                    "request"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "52"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"34-aPlzEHoq7SY4+ASoRRdPftOJL5o\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 14:21:21 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Código enviado para confirmar el pago\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Confirm",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE2LCJwaG9uZSI6Iis1NzMxNjU3Njg2MTAiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzc2MDkwMjk0LCJleHAiOjE3NzYxNzY2OTR9.GMmw3TjIKFK-hf1NoN9TGeNt299HdtZUHB6wqsmbxVA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"code\": \"881386\",\r\n  \"reservationId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/payments/confirm",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "payments",
+                "confirm"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "401-Codigo obligatorio",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"otp\": \"881386\",\r\n  \"reservationId\": 1\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/payments/confirm",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "payments",
+                    "confirm"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "78"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"4e-o8RGjBWPhNy4i60q0FK1Pg69/oQ\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 14:26:29 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"El código es obligatorio\",\n    \"error\": \"Bad Request\",\n    \"statusCode\": 400\n}"
+            },
+            {
+              "name": "201-exitoso",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"code\": \"881386\",\r\n  \"reservationId\": 1\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/payments/confirm",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "payments",
+                    "confirm"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "102"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"66-2leskeUbPBfKWtroz2z0stooyC0\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 14:28:12 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Pago realizado con éxito\",\n    \"transactionId\": 2,\n    \"amount\": \"500000.00\",\n    \"phone\": \"+573165768610\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 - Sports",
+      "item": [
+        {
+          "name": "Create Sport",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsInBob25lIjoiKzU3MzI0NDYzNDExNSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NjA4OTUzNCwiZXhwIjoxNzc2MTc1OTM0fQ.hAdqQLKnR5MugGl8J1jHSq366O-Z1JRAS3jO3xIBBeQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Baloncesto\",\r\n  \"description\": \"Deporte de grupo\",\r\n  \"maxPlayers\": 7\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/sports",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "sports"
+              ]
+            },
+            "description": "**Endpoint para crear un deporte.**\n\nMétodo: POST  \nRuta: /sports\n\nEste endpoint permite a un usuario agregar un deporte, pero en este caso estamos con el rol de CLIENT lo cual no nos va a dejar agregar un deporte porque no tiene autorización para realizar la acción."
+          },
+          "response": [
+            {
+              "name": "201-created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Baloncesto\",\r\n  \"description\": \"Deporte de grupo\",\r\n  \"maxPlayers\": 7\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/sports",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "sports"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "154"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"9a-uGtm1KTrgfDE+WBjf29HXyDOkTs\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 12:10:17 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"name\": \"Baloncesto\",\n    \"description\": \"Deporte de grupo\",\n    \"maxPlayers\": 7,\n    \"id\": 1,\n    \"createdAt\": \"2026-04-13T12:10:17.725Z\",\n    \"updatedAt\": \"2026-04-13T12:10:17.725Z\"\n}"
+            },
+            {
+              "name": "403- No tiene autorización",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Baloncesto\",\r\n  \"description\": \"Deporte de grupo\",\r\n  \"maxPlayers\": 7\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/sports",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "sports"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "82"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"52-pEgwOFinXM02zARGi+nybTGfhlc\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 12:12:03 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"No tienes permisos para acceder\",\n    \"error\": \"Forbidden\",\n    \"statusCode\": 403\n}"
+            }
+          ]
+        },
+        {
+          "name": "Read Sport",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE4LCJwaG9uZSI6Iis1NzMxNjU3Njg2MTAiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzc2MDU4NzMyLCJleHAiOjE3NzYxNDUxMzJ9.Ao-9kv6ArcnXYiOakZzdvIv33UkhvIvDm8Lc2ogak7A",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:3000/sports/3",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "sports",
+                "3"
+              ]
+            },
+            "description": "**Endpoint para leer o ver un deporte.**\n\nMétodo: GET  \nRuta: /sports/{id}\n\nEste endpoint permite a un usuario ver un deporte de acuerdo a su id asociado, permite ver los datos que se tienen de este, si se pone el id incorrecto saldrá que el deporte no existe."
+          },
+          "response": [
+            {
+              "name": "200 - Vista de deporte exitosa",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/sports/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "sports",
+                    "1"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": "{\r\n    \"id\": 1,\r\n    \"name\": \"Futbol\",\r\n    \"description\": \"Deporte de grupo\",\r\n    \"maxPlayers\": 10,\r\n    \"createdAt\": \"2026-04-13T02:10:41.474Z\",\r\n    \"updatedAt\": \"2026-04-13T02:10:41.474Z\"\r\n}"
+            },
+            {
+              "name": "404 - Deporte inexistente",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/sports/3",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "sports",
+                    "3"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": "{\r\n    \"message\": \"No existe un deporte con id 3\",\r\n    \"error\": \"Not Found\",\r\n    \"statusCode\": 404\r\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Sport",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE4LCJwaG9uZSI6Iis1NzMxNjU3Njg2MTAiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzc2MDU4NzMyLCJleHAiOjE3NzYxNDUxMzJ9.Ao-9kv6ArcnXYiOakZzdvIv33UkhvIvDm8Lc2ogak7A",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:3000/sports/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "sports",
+                "1"
+              ]
+            },
+            "description": "**Endpoint para eliminar un deporte.**\n\nMétodo: DELETE  \nRuta: /sports/{id}\n\nEste endpoint permite a un usuario eliminar un deporte, pero en este caso estamos con el rol de CLIENT lo cual no nos va a dejar eliminar un deporte porque no tiene autorización para realizar la acción."
+          },
+          "response": [
+            {
+              "name": "403 - No tiene autorización",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "http://localhost:3000/sports/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "sports",
+                    "1"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": "{\r\n    \"message\": \"Unauthorized\",\r\n    \"statusCode\": 401\r\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Sport",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE4LCJwaG9uZSI6Iis1NzMxNjU3Njg2MTAiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzc2MDU4NzMyLCJleHAiOjE3NzYxNDUxMzJ9.Ao-9kv6ArcnXYiOakZzdvIv33UkhvIvDm8Lc2ogak7A",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Baloncesto\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/sports/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "sports",
+                "1"
+              ]
+            },
+            "description": "**Endpoint para actualizar datos de un deporte.**\n\nMétodo: PATCH  \nRuta: /sports/{id}\n\nEste endpoint permite a un usuario actualizar datos un deporte, pero en este caso estamos con el rol de CLIENT lo cual no nos va a dejar actualizar un deporte porque no tiene autorización para realizar la acción."
+          },
+          "response": [
+            {
+              "name": "401 - No tiene autorización",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Baloncesto\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/sports/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "sports",
+                    "1"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": "{\r\n    \"message\": \"Unauthorized\",\r\n    \"statusCode\": 401\r\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Sport",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            },
+            "description": "**Endpoint para crear un deporte.**\n\nMétodo: POST  \nRuta: /sports\n\nEste endpoint permite a un usuario agregar un deporte, si todo sale bien crea su nombre, descripción y número de participantes, pero si intento agregar un deporte que ya existe me sale error."
+          },
+          "response": [
+            {
+              "name": "201 - Creación exitosa",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Futbol\",\r\n  \"description\": \"Deporte de grupo\",\r\n  \"maxPlayers\": 10\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/sports",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "sports"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"name\": \"Futbol\",\n    \"description\": \"Deporte de grupo\",\n    \"maxPlayers\": 10,\n    \"id\": 1,\n    \"createdAt\": \"2026-04-13T02:10:41.474Z\",\n    \"updatedAt\": \"2026-04-13T02:10:41.474Z\"\n}"
+            },
+            {
+              "name": "409 - Conflict",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Futbol\",\r\n  \"description\": \"Deporte de grupo\",\r\n  \"maxPlayers\": 10\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/sports",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "sports"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": "{\r\n    \"message\": \"Ya existe un deporte con ese nombre\",\r\n    \"error\": \"Conflict\",\r\n    \"statusCode\": 409\r\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 - Scenarios",
+      "item": [
+        {
+          "name": "Create Scenario",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjcsInBob25lIjoiKzU3MzI0NDYzNDExNSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NjA4OTUzNCwiZXhwIjoxNzc2MTc1OTM0fQ.hAdqQLKnR5MugGl8J1jHSq366O-Z1JRAS3jO3xIBBeQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Cancha 1\",\r\n  \"location\": \"Barrio Centro\",\r\n  \"price\": 500000,\r\n  \"sportId\": 1,\r\n  \"capacity\": 10\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/scenarios",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "scenarios"
+              ]
+            },
+            "description": "**Endpoint para crear un escenario.**\n\nMétodo: POST  \nRuta: /scenarios\n\nEste endpoint permite a un usuario agregar un escenario, pero en este caso estamos con el rol de CLIENT lo cual no nos va a dejar agregar un escenario porque no tiene autorización para realizar la acción."
+          },
+          "response": [
+            {
+              "name": "403- No tiene permisos",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Cancha 1\",\r\n  \"location\": \"Barrio Centro\",\r\n  \"price\": 500000,\r\n  \"sportId\": 1\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/scenarios",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "scenarios"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "82"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"52-pEgwOFinXM02zARGi+nybTGfhlc\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 14:02:10 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"No tienes permisos para acceder\",\n    \"error\": \"Forbidden\",\n    \"statusCode\": 403\n}"
+            },
+            {
+              "name": "201-Create",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Cancha 1\",\r\n  \"location\": \"Barrio Centro\",\r\n  \"price\": 500000,\r\n  \"sportId\": 1,\r\n  \"capacity\": 10\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/scenarios",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "scenarios"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "344"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"158-UzmLDjWSqgVGE/za8Otv4vOnF+Y\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 13 Apr 2026 14:14:18 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"name\": \"Cancha 1\",\n    \"location\": \"Barrio Centro\",\n    \"capacity\": 10,\n    \"price\": 500000,\n    \"status\": \"available\",\n    \"sport\": {\n        \"id\": 1,\n        \"name\": \"Baloncesto\",\n        \"description\": \"Deporte de grupo\",\n        \"maxPlayers\": 7,\n        \"createdAt\": \"2026-04-13T12:10:17.725Z\",\n        \"updatedAt\": \"2026-04-13T12:10:17.725Z\"\n    },\n    \"id\": 1,\n    \"createdAt\": \"2026-04-13T14:14:18.831Z\",\n    \"updatedAt\": \"2026-04-13T14:14:18.831Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Read Scenario",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:3000/scenarios/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "scenarios",
+                "1"
+              ]
+            },
+            "description": "**Endpoint para leer o ver un escenario.**\n\nMétodo: GET  \nRuta: /scenarios/{id}\n\nEste endpoint permite a un usuario ver un escenario de acuerdo a su id asociado, permite ver los datos que se tienen de este, si se pone el id incorrecto saldrá que el escenario no existe."
+          },
+          "response": [
+            {
+              "name": "200 - Vista de escenario exitosa",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:3000/scenarios/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "scenarios",
+                    "1"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": "{\r\n    \"id\": 1,\r\n    \"name\": \"Cancha 1\",\r\n    \"location\": \"Barrio Centro\",\r\n    \"capacity\": 10,\r\n    \"price\": \"50000.00\",\r\n    \"status\": \"available\",\r\n    \"createdAt\": \"2026-04-13T06:09:34.663Z\",\r\n    \"updatedAt\": \"2026-04-13T06:09:34.663Z\",\r\n    \"sport\": {\r\n        \"id\": 1,\r\n        \"name\": \"Futbol\",\r\n        \"description\": \"Deporte de grupo\",\r\n        \"maxPlayers\": 10,\r\n        \"createdAt\": \"2026-04-13T02:10:41.474Z\",\r\n        \"updatedAt\": \"2026-04-13T02:10:41.474Z\"\r\n    }\r\n}"
+            },
+            {
+              "name": "404 - Escenario inexistente",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/scenarios/2",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "scenarios",
+                    "2"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": "{\r\n    \"message\": \"No existe un escenario con id 2\",\r\n    \"error\": \"Not Found\",\r\n    \"statusCode\": 404\r\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Scenario",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE4LCJwaG9uZSI6Iis1NzMxNjU3Njg2MTAiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzc2MDYwNjk0LCJleHAiOjE3NzYxNDcwOTR9.OxZN8Xud9u2V-qWPYOxPH7wTgXIW_csH0RjqoPXGfok",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"price\": 600000\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/scenarios/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "scenarios",
+                "1"
+              ]
+            },
+            "description": "**Endpoint para actualizar datos de un escenario.**\n\nMétodo: PATCH  \nRuta: /scenarios/{id}\n\nEste endpoint permite a un usuario actualizar datos un escenario, pero en este caso estamos con el rol de CLIENT lo cual no nos va a dejar actualizar un escenario porque no tiene autorización para realizar la acción."
+          },
+          "response": [
+            {
+              "name": "401 - No tiene autorización",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"price\": 60000\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/scenarios/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "scenarios",
+                    "1"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": "{\r\n    \"message\": \"Unauthorized\",\r\n    \"statusCode\": 401\r\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Scenario",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE4LCJwaG9uZSI6Iis1NzMxNjU3Njg2MTAiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzc2MDYwNjk0LCJleHAiOjE3NzYxNDcwOTR9.OxZN8Xud9u2V-qWPYOxPH7wTgXIW_csH0RjqoPXGfok",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:3000/scenarios/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "scenarios",
+                "1"
+              ]
+            },
+            "description": "**Endpoint para eliminar un escenario.**\n\nMétodo: DELETE  \nRuta: /scenarios/{id}\n\nEste endpoint permite a un usuario eliminar un escenario, pero en este caso estamos con el rol de CLIENT lo cual no nos va a dejar eliminar un escenario porque no tiene autorización para realizar la acción."
+          },
+          "response": [
+            {
+              "name": "401 - No tiene autorización",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/scenarios/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "scenarios",
+                    "1"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": "{\r\n    \"message\": \"Unauthorized\",\r\n    \"statusCode\": 401\r\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 - Reservations",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"phone\": \"+573165768610\",\r\n  \"name\": \"Maria Paz\",\r\n  \"password\": \"123456\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -40,13 +2005,13 @@
           "response": []
         },
         {
-          "name": "2. Verificar númerost",
+          "name": "Verify",
           "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"phone\": \"+573244634115\",\r\n  \"code\": \"563174\"\r\n}",
+              "raw": "{\r\n  \"phone\": \"+573165768610\",\r\n  \"code\": \"583629\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -69,13 +2034,29 @@
           "response": []
         },
         {
-          "name": "3. Iniciar sesión",
+          "name": "Login",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"phone\": \"+573244634115\",\r\n  \"password\": \"123456\"\r\n}",
+              "raw": "{\r\n  \"phone\": \"+573165768610\",\r\n  \"password\": \"123456\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -96,29 +2077,300 @@
             }
           },
           "response": []
-        }
-      ]
-    },
-    {
-      "name": "03 - Payments",
-      "item": [
+        },
         {
-          "name": "Payment - Request OTP",
+          "name": "Create Reservation",
           "request": {
-            "method": "GET",
-            "header": []
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE2LCJwaG9uZSI6Iis1NzMxNjU3Njg2MTAiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzc2MDg5Nzc2LCJleHAiOjE3NzYxNzYxNzZ9.Rh-yS5Cf1bqpgjwudHhpas7Scll5nzDmkakJXGhJ_ng",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"scenarioId\": 1,\r\n  \"date\": \"2026-04-15\",\r\n  \"startTime\": \"10:00:00\",\r\n  \"endTime\": \"12:00:00\",\r\n  \"peopleCount\": 10\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/reservations",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "**Endpoint para crear una reservación.**\n\nMétodo: POST  \nRuta: /reservations\n\nEste endpoint permite a un usuario agregar una reservación, pero en este caso estamos con el rol de CLIENT lo cual no nos va a dejar agregar una reservación porque no tiene autorización para realizar la acción."
           },
-          "response": []
+          "response": [
+            {
+              "name": "401 - No tiene autorización",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"scenarioId\": 1,\r\n  \"date\": \"2026-04-15\",\r\n  \"startTime\": \"10:00:00\",\r\n  \"endTime\": \"12:00:00\",\r\n  \"peopleCount\": 10\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/reservations",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "reservations"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": "{\r\n    \"message\": \"Unauthorized\",\r\n    \"statusCode\": 401\r\n}"
+            }
+          ]
+        },
+        {
+          "name": "Read Reservation",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE4LCJwaG9uZSI6Iis1NzMxNjU3Njg2MTAiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzc2MDYzNjg0LCJleHAiOjE3NzYxNTAwODR9.Vhk-qYaI98qy4hgOhhqivqC05TbuTVlbDoVJT2Gps_I",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:3000/reservations/3",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "reservations",
+                "3"
+              ]
+            },
+            "description": "**Endpoint para leer o ver una reservación.**\n\nMétodo: GET  \nRuta: /reservations/{id}\n\nEste endpoint permite a un usuario ver una reservación de acuerdo a su id asociado, permite ver los datos que se tienen de esta, si se pone el id incorrecto saldrá que la reservación no existe."
+          },
+          "response": [
+            {
+              "name": "200 - Vista de reservación exitosa",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/reservations/3",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "reservations",
+                    "3"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            },
+            {
+              "name": "404 - Reservación inexistente",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/reservations/3",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "reservations",
+                    "3"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Update Reservation",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE4LCJwaG9uZSI6Iis1NzMxNjU3Njg2MTAiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzc2MDYzNjg0LCJleHAiOjE3NzYxNTAwODR9.Vhk-qYaI98qy4hgOhhqivqC05TbuTVlbDoVJT2Gps_I",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"startTime\": \"11:00:00\",\r\n  \"endTime\": \"13:00:00\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/reservations/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "reservations",
+                "1"
+              ]
+            },
+            "description": "**Endpoint para actualizar datos de una reservación.**\n\nMétodo: PATCH  \nRuta: /reservations/{id}\n\nEste endpoint permite a un usuario actualizar datos una reservación, pero en este caso estamos con el rol de CLIENT lo cual no nos va a dejar actualizar una reservación porque no tiene autorización para realizar la acción."
+          },
+          "response": [
+            {
+              "name": "401 - No tiene autorización",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"startTime\": \"11:00:00\",\r\n  \"endTime\": \"13:00:00\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/reservations/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "reservations",
+                    "1"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": "{\r\n    \"message\": \"Unauthorized\",\r\n    \"statusCode\": 401\r\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Reservation",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE4LCJwaG9uZSI6Iis1NzMxNjU3Njg2MTAiLCJyb2xlIjoiY2xpZW50IiwiaWF0IjoxNzc2MDY0Mjk1LCJleHAiOjE3NzYxNTA2OTV9.1xO-A8ZYU84I_GqbL8Nj18poqBYv6Mu2Sq09MobAUuI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://localhost:3000/reservations/3",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "reservations",
+                "3"
+              ]
+            },
+            "description": "**Endpoint para eliminar una reservación.**\n\nMétodo: DELETE  \nRuta: /reservations/{id}\n\nEste endpoint permite a un usuario eliminar una reservación, pero en este caso estamos con el rol de CLIENT lo cual no nos va a dejar eliminar una reservación porque no tiene autorización para realizar la acción."
+          },
+          "response": [
+            {
+              "name": "401 - No tiene autorización",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "http://localhost:3000/reservations/3",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "reservations",
+                    "3"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "Text",
+              "header": [],
+              "cookie": [],
+              "body": "{\r\n    \"message\": \"Unauthorized\",\r\n    \"statusCode\": 401\r\n}"
+            }
+          ]
         }
       ]
-    },
-    {
-      "name": "New Request",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
     }
   ]
 }

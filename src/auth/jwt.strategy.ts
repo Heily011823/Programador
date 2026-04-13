@@ -1,24 +1,24 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly usersService: UsersService) {
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET || 'secretKey',
+      secretOrKey: configService.get<string>('JWT_SECRET'),
     });
   }
 
   async validate(payload: { sub: number; phone: string; role: string }) {
     const user = await this.usersService.findById(payload.sub);
-
-    console.log('PAYLOAD JWT:', payload);
-
-    console.log('USER ENCONTRADO:', user);
 
     if (!user) {
       throw new UnauthorizedException('Usuario no válido');
@@ -26,9 +26,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     return {
       id: user.id,
+      name: user.name,
       phone: user.phone,
       role: user.role,
-      name: user.name,
     };
   }
 }

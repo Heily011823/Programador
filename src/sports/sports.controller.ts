@@ -14,23 +14,22 @@ import { SportsService } from './sports.service';
 import { CreateSportDto } from './dto/create-sport.dto';
 import { UpdateSportDto } from './dto/update-sport.dto';
 import { QuerySportDto } from './dto/read-sport.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles/roles.guard';
 import { Roles } from '../auth/roles/roles.decorator';
+import { UserRole } from '../users/entities/user.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('sports')
 export class SportsController {
   constructor(private readonly sportsService: SportsService) {}
 
-  // SOLO ADMIN
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-@Roles('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post()
   create(@Body() createSportDto: CreateSportDto) {
     return this.sportsService.create(createSportDto);
   }
 
-  // PÚBLICO (o puedes protegerlo si quieres)
   @Get()
   findAll(@Query() query: QuerySportDto) {
     return this.sportsService.findAll(query);
@@ -41,9 +40,8 @@ export class SportsController {
     return this.sportsService.findOne(id);
   }
 
-  // SOLO ADMIN
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('ADMIN')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -52,9 +50,8 @@ export class SportsController {
     return this.sportsService.update(id, updateSportDto);
   }
 
-  // SOLO ADMIN
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('ADMIN')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.sportsService.remove(id);

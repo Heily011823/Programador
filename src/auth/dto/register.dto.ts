@@ -1,8 +1,11 @@
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString, MinLength, Matches } from 'class-validator';
 
 export class RegisterDto {
   @IsString()
   @IsNotEmpty()
+  @Matches(/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/, {
+    message: 'El nombre solo debe contener letras',
+  })
   name: string;
 
   @IsString()

@@ -21,7 +21,7 @@ export class AuthService {
   ) {}
 
   async register(data: RegisterDto) {
-    const existingUser = await this.usersService.findByPhone(data.phone);
+    const existingUser = await this.usersService.findByPhoneWithPassword(data.phone);
 
     if (existingUser) {
       throw new BadRequestException('El número ya está registrado');
@@ -51,7 +51,7 @@ export class AuthService {
   }
 
   async verifyPhone(data: VerifyPhoneDto) {
-    const user = await this.usersService.findByPhone(data.phone);
+    const user = await this.usersService.findByPhoneWithPassword(data.phone);
 
     if (!user) {
       throw new UnauthorizedException('Usuario no existe');
@@ -76,7 +76,7 @@ export class AuthService {
   }
 
   async login(data: LoginDto) {
-    const user = await this.usersService.findByPhone(data.phone);
+    const user = await this.usersService.findByPhoneWithPassword(data.phone);
 
     if (!user) {
       throw new UnauthorizedException('Usuario no existe');
@@ -100,8 +100,14 @@ export class AuthService {
       role: user.role,
     };
 
+    console.log('PAYLOAD QUE SE FIRMA:', payload);
+
+    const token = this.jwtService.sign(payload);
+
+    console.log('TOKEN GENERADO:', token);
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: token,
       user: {
         id: user.id,
         name: user.name,
