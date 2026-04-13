@@ -8,6 +8,9 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
+import { ReservationsModule } from './reservations/reservations.module';
+import { SportsModule } from './sports/sports.module';
+import { ScenariosModule } from './scenarios/scenarios.module';
 
 @Module({
   imports: [
@@ -26,6 +29,10 @@ import { User } from './users/entities/user.entity';
     }),
     AuthModule,
     UsersModule,
+    SportsModule,
+    ScenariosModule,
+    ReservationsModule,
+
   ],
   controllers: [AppController],
   providers: [AppService],
