@@ -1,6 +1,6 @@
 import {ConflictException, Injectable, NotFoundException,} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Scenario } from './entities/scenario.entity';
 import { Sport } from '../sports/entities/sport.entity';
 import { CreateScenarioDto } from './dto/create-scenario.dto';
@@ -38,8 +38,8 @@ export class ScenariosService {
 
     const existingScenario = await this.scenarioRepository.findOne({
       where: {
-        name: ILike(normalizedName),
-        location: ILike(normalizedLocation),
+        name: Like(normalizedName),
+        location: Like(normalizedLocation),
       },
       relations: ['sport'],
     });
@@ -66,7 +66,7 @@ export class ScenariosService {
     const where: any = {};
 
     if (query.name) {
-      where.name = ILike(`%${query.name.trim()}%`);
+      where.name = Like(`%${query.name.trim()}%`);
     }
 
     if (query.status) {
@@ -129,8 +129,8 @@ export class ScenariosService {
 
     const existingScenario = await this.scenarioRepository.findOne({
       where: {
-        name: ILike(newName),
-        location: ILike(newLocation),
+        name: Like(newName),
+        location: Like(newLocation),
       },
       relations: ['sport'],
     });

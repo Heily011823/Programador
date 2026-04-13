@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Sport } from './entities/sport.entity';
 import { CreateSportDto } from './dto/create-sport.dto';
 import { UpdateSportDto } from './dto/update-sport.dto';
@@ -25,7 +25,7 @@ export class SportsService {
     const normalizedName = this.normalizeName(createSportDto.name);
 
     const existingSport = await this.sportRepository.findOne({
-      where: { name: ILike(normalizedName) },
+      where: { name: Like(normalizedName) },
     });
 
     if (existingSport) {
@@ -47,7 +47,7 @@ export class SportsService {
     const skip = (page - 1) * limit;
 
     const where = query.name
-      ? { name: ILike(`%${query.name.trim()}%`) }
+      ? { name: Like(`%${query.name.trim()}%`) }
       : {};
 
     const [data, total] = await this.sportRepository.findAndCount({
@@ -87,7 +87,7 @@ export class SportsService {
       const normalizedName = this.normalizeName(updateSportDto.name);
 
       const existingSport = await this.sportRepository.findOne({
-        where: { name: ILike(normalizedName) },
+        where: { name: Like(normalizedName) },
       });
 
       if (existingSport && existingSport.id !== id) {
