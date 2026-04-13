@@ -24,7 +24,7 @@ export class SportsController {
 
   // SOLO ADMIN
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('ADMIN')
+@Roles('admin')
   @Post()
   create(@Body() createSportDto: CreateSportDto) {
     return this.sportsService.create(createSportDto);

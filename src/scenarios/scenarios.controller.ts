@@ -23,7 +23,7 @@ export class ScenariosController {
   constructor(private readonly scenariosService: ScenariosService) {}
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('ADMIN')
+ @Roles('admin')
   @Post()
   create(@Body() createScenarioDto: CreateScenarioDto) {
     return this.scenariosService.create(createScenarioDto);
