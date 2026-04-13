@@ -9,12 +9,12 @@ import { TwilioService } from './twilio.service';
   imports: [
     UsersModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '5m' },
+      secret: process.env.JWT_SECRET || 'secretKey',
+      signOptions: { expiresIn: '1d' },
     }),
   ],
-  controllers: [AuthController],
   providers: [AuthService, TwilioService],
+  controllers: [AuthController],
   exports: [AuthService],
 })
 export class AuthModule {}
