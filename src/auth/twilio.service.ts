@@ -1,10 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import twilio from 'twilio';
+import { Twilio } from 'twilio';
 
 @Injectable()
 export class TwilioService {
-  private client: ReturnType<typeof twilio>;
+  private client: Twilio;
 
   constructor(private readonly configService: ConfigService) {
     const sid = this.configService.get<string>('TWILIO_ACCOUNT_SID');
@@ -17,7 +17,7 @@ export class TwilioService {
       throw new Error('Twilio credentials no cargadas');
     }
 
-    this.client = twilio(sid, token);
+    this.client = new Twilio(sid, token);
   }
 
   async sendVerificationCode(phone: string, code: string) {

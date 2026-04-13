@@ -20,6 +20,6 @@ export class UsersController {
 
   @Get(':phone')
   async findOne(@Param('phone') phone: string) {
-    return this.usersService.findOneByPhone(phone);
+    return this.usersService.findByPhone(phone);
   }
 }

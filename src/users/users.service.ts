@@ -24,4 +24,10 @@ export class UsersService {
   async update(id: number, userData: Partial<User>): Promise<void> {
     await this.usersRepository.update(id, userData);
   }
+
+  async findAll() {
+  return await this.usersRepository.find({
+    order: { id: 'ASC' },
+  });
+}
 }
