@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from '../users/user.entity'; 
+import { User } from '../users/entities/user.entity';
 
 @Entity('payments')
 export class Payment {
@@ -21,7 +21,6 @@ export class Payment {
   @Column({ default: false })
   isConfirmed!: boolean;
 
-  
   @ManyToOne(() => User, (user) => user.payments)
-  user!: User; 
+  user!: User;
 }

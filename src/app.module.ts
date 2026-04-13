@@ -7,10 +7,10 @@ import { AppService } from './app.service';
 
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { User } from './users/entities/user.entity';
 import { ReservationsModule } from './reservations/reservations.module';
 import { SportsModule } from './sports/sports.module';
 import { ScenariosModule } from './scenarios/scenarios.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -19,12 +19,12 @@ import { ScenariosModule } from './scenarios/scenarios.module';
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'Cataratas202420.',
-      database: 'programador',
-      entities: [User],
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      autoLoadEntities: true,
       synchronize: true,
     }),
     AuthModule,
@@ -32,7 +32,7 @@ import { ScenariosModule } from './scenarios/scenarios.module';
     SportsModule,
     ScenariosModule,
     ReservationsModule,
-
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

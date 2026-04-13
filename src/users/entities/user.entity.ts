@@ -1,22 +1,50 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  OneToMany,
+} from 'typeorm';
+import { Payment } from '../../payments/payment.entity';
+
+export enum UserRole {
+  ADMIN = 'admin',
+  CLIENT = 'client',
+}
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
-  @Column({ length: 100 })
-  name: string;
+  @Column({ type: 'varchar' })
+  name!: string;
 
-  @Column({ unique: true, length: 20 })
-  phone: string;
+  @Column({ type: 'varchar', unique: true })
+  phone!: string;
 
-  @Column()
-  password: string;
+  @Column({ type: 'varchar' })
+  password!: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  verificationCode?: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  verificationCodeExpires?: Date | null;
 
   @Column({ default: false })
-  phoneVerified: boolean;
+  isVerified!: boolean;
 
-  @Column({ type: 'varchar', length: 6, nullable: true })
-  verificationCode: string | null;
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.CLIENT,
+  })
+  role!: UserRole;
+
+  @OneToMany(() => Payment, (payment) => payment.user)
+  payments!: Payment[];
+
+  @CreateDateColumn()
+  createdAt!: Date;
 }

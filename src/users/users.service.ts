@@ -25,9 +25,15 @@ export class UsersService {
     await this.usersRepository.update(id, userData);
   }
 
-  async findAll() {
-  return await this.usersRepository.find({
-    order: { id: 'ASC' },
-  });
-}
+  async findAll(): Promise<User[]> {
+    return await this.usersRepository.find({
+      order: { id: 'ASC' },
+    });
+  }
+
+  async findById(id: number): Promise<User | null> {
+    return await this.usersRepository.findOne({
+      where: { id },
+    });
+  }
 }

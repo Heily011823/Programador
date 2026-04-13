@@ -10,6 +10,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { VerifyPhoneDto } from './dto/verify-phone.dto';
 import { TwilioService } from './twilio.service';
+import { UserRole } from '../users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -35,8 +36,9 @@ export class AuthService {
       name: data.name,
       phone: data.phone,
       password: hashedPassword,
-      phoneVerified: false,
+      isVerified: false,
       verificationCode,
+      role: UserRole.CLIENT,
     });
 
     await this.twilioService.sendVerificationCode(user.phone, verificationCode);
@@ -55,7 +57,7 @@ export class AuthService {
       throw new UnauthorizedException('Usuario no existe');
     }
 
-    if (user.phoneVerified) {
+    if (user.isVerified) {
       throw new BadRequestException('El número ya fue verificado');
     }
 
@@ -64,7 +66,7 @@ export class AuthService {
     }
 
     await this.usersService.update(user.id, {
-      phoneVerified: true,
+      isVerified: true,
       verificationCode: null,
     });
 
@@ -86,7 +88,7 @@ export class AuthService {
       throw new UnauthorizedException('Contraseña incorrecta');
     }
 
-    if (!user.phoneVerified) {
+    if (!user.isVerified) {
       throw new UnauthorizedException(
         'Debes verificar tu número antes de iniciar sesión',
       );
@@ -95,10 +97,17 @@ export class AuthService {
     const payload = {
       sub: user.id,
       phone: user.phone,
+      role: user.role,
     };
 
     return {
       access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        role: user.role,
+      },
     };
   }
 }
