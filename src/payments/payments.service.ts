@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Payment } from './payment.entity';
 import { TwoFaService } from '../twofa/twofa.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class PaymentsService {
@@ -12,56 +13,67 @@ export class PaymentsService {
     private twoFaService: TwoFaService,
   ) {}
 
-  //  Solicitar pago
-  async requestPayment(phone: string, amount: number) {
+  async requestPayment(user: any, amount: number) {
+    if (amount === undefined || amount === null || amount <= 0) {
+      throw new BadRequestException('El monto debe ser mayor que 0');
+    }
+
     const code = this.twoFaService.generateCode();
+    const codeHash = await bcrypt.hash(code, 10);
 
     const expires = new Date();
     expires.setMinutes(expires.getMinutes() + 5);
 
     const payment = this.paymentRepo.create({
-      phone,
+      phone: user.phone,
       amount,
-      code,
+      codeHash,
       expiresAt: expires,
       isConfirmed: false,
+      attempts: 0,
+      user,
     });
 
     await this.paymentRepo.save(payment);
-
-    await this.twoFaService.sendCode(phone, code);
+    await this.twoFaService.sendCode(user.phone, code);
 
     return {
       message: 'Código enviado para confirmar el pago',
     };
   }
 
-  //  Confirmar pago
-  async confirmPayment(phone: string, code: string) {
+  async confirmPayment(user: any, code: string) {
     const payment = await this.paymentRepo.findOne({
-      where: { phone, isConfirmed: false },
-      order: { id: 'DESC' }, // último pago
+      where: {
+        phone: user.phone,
+        isConfirmed: false,
+      },
+      order: { id: 'DESC' },
+      relations: ['user'],
     });
 
     if (!payment) {
       throw new BadRequestException('No hay pago pendiente');
     }
 
-    // validar expiración
     if (new Date() > payment.expiresAt) {
       throw new BadRequestException('El código ha expirado');
     }
 
-    const isValid = await this.twoFaService.validateCode(
-      payment.code,
-      code,
-    );
-
-    if (!isValid) {
-      throw new BadRequestException('Código inválido o expirado');
+    if (payment.attempts >= 3) {
+      throw new BadRequestException(
+        'Demasiados intentos fallidos. Solicita un nuevo código',
+      );
     }
 
-    // confirmar pago
+    const isValid = await bcrypt.compare(code, payment.codeHash);
+
+    if (!isValid) {
+      payment.attempts += 1;
+      await this.paymentRepo.save(payment);
+      throw new BadRequestException('Código inválido');
+    }
+
     payment.isConfirmed = true;
     await this.paymentRepo.save(payment);
 

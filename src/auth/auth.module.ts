@@ -10,7 +10,7 @@ import { TwilioService } from './twilio.service';
   imports: [
     UsersModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'secreto_super_seguro',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '5m' },
     }),
   ],

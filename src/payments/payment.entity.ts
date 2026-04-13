@@ -13,7 +13,7 @@ export class Payment {
   amount!: number;
 
   @Column()
-  code!: string;
+  codeHash!: string;
 
   @Column({ type: 'timestamp' })
   expiresAt!: Date;
@@ -21,6 +21,9 @@ export class Payment {
   @Column({ default: false })
   isConfirmed!: boolean;
 
-  @ManyToOne(() => User, (user) => user.payments)
+  @Column({ default: 0 })
+  attempts!: number;
+
+  @ManyToOne(() => User, (user) => user.payments, { eager: false })
   user!: User;
 }

@@ -29,57 +29,51 @@ describe('PaymentsController', () => {
     expect(controller).toBeDefined();
   });
 
-  // Solicitar pago (envía código)
   it('debería solicitar un pago y enviar código', async () => {
-    const dto = { phone: '123', amount: 100 };
+    const req = { user: { id: 1, phone: '123' } };
+    const body = { amount: 100 };
 
     (service.requestPayment as jest.Mock).mockResolvedValue({
       message: 'Código enviado para confirmar el pago',
     });
 
-    const result = await controller.requestPayment(dto);
+    const result = await controller.request(req, body);
 
-    expect(service.requestPayment).toHaveBeenCalledWith(
-      dto.phone,
-      dto.amount,
-    );
-
+    expect(service.requestPayment).toHaveBeenCalledWith(req.user, body.amount);
     expect(result).toEqual({
       message: 'Código enviado para confirmar el pago',
     });
   });
 
-  //  Error por datos faltantes
-  it('debería lanzar error si faltan datos', async () => {
-    await expect(controller.requestPayment({})).rejects.toThrow(
-      new BadRequestException('Teléfono y monto son obligatorios'),
+  it('debería lanzar error si falta el monto', async () => {
+    const req = { user: { id: 1, phone: '123' } };
+
+    await expect(controller.request(req, {} as any)).rejects.toThrow(
+      new BadRequestException('El monto es obligatorio'),
     );
   });
 
-  //  Confirmar pago
   it('debería confirmar el pago con código correcto', async () => {
-    const dto = { phone: '123', code: '123456' };
+    const req = { user: { id: 1, phone: '123' } };
+    const body = { code: '123456' };
 
     (service.confirmPayment as jest.Mock).mockResolvedValue({
       message: 'Pago realizado con éxito',
     });
 
-    const result = await controller.confirmPayment(dto);
+    const result = await controller.confirm(req, body);
 
-    expect(service.confirmPayment).toHaveBeenCalledWith(
-      dto.phone,
-      dto.code,
-    );
-
+    expect(service.confirmPayment).toHaveBeenCalledWith(req.user, body.code);
     expect(result).toEqual({
       message: 'Pago realizado con éxito',
     });
   });
 
-  //  Error por datos faltantes en confirmación
-  it('debería lanzar error si faltan datos en confirmación', async () => {
-    await expect(controller.confirmPayment({})).rejects.toThrow(
-      new BadRequestException('Teléfono y código son obligatorios'),
+  it('debería lanzar error si falta el código', async () => {
+    const req = { user: { id: 1, phone: '123' } };
+
+    await expect(controller.confirm(req, {} as any)).rejects.toThrow(
+      new BadRequestException('El código es obligatorio'),
     );
   });
 });

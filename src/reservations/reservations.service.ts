@@ -23,10 +23,49 @@ export class ReservationsService {
   ) {}
 
   private calculateHours(startTime: string, endTime: string): number {
-    const startHour = parseInt(startTime.split(':')[0], 10);
-    const endHour = parseInt(endTime.split(':')[0], 10);
+    const startParts = startTime.split(':');
+    const endParts = endTime.split(':');
 
-    return endHour - startHour;
+    const startHour = parseInt(startParts[0], 10);
+    const startMinute = parseInt(startParts[1], 10);
+    const endHour = parseInt(endParts[0], 10);
+    const endMinute = parseInt(endParts[1], 10);
+
+    const startTotalMinutes = startHour * 60 + startMinute;
+    const endTotalMinutes = endHour * 60 + endMinute;
+
+    return (endTotalMinutes - startTotalMinutes) / 60;
+  }
+
+  private async validateReservationConflict(
+    scenarioId: number,
+    date: string,
+    startTime: string,
+    endTime: string,
+    excludeReservationId?: number,
+  ): Promise<void> {
+    const existingReservations = await this.reservationRepository.find({
+      where: {
+        scenario: { id: scenarioId },
+        date,
+        status: ReservationStatus.ACTIVE,
+      },
+      relations: ['scenario'],
+    });
+
+    const overlap = existingReservations.find((reservation) => {
+      if (excludeReservationId && reservation.id === excludeReservationId) {
+        return false;
+      }
+
+      return startTime < reservation.endTime && endTime > reservation.startTime;
+    });
+
+    if (overlap) {
+      throw new BadRequestException(
+        'Ya existe una reserva en ese horario para este escenario',
+      );
+    }
   }
 
   async create(dto: CreateReservationDto): Promise<Reservation> {
@@ -52,33 +91,18 @@ export class ReservationsService {
       );
     }
 
-    const existingReservations = await this.reservationRepository.find({
-      where: {
-        scenario: { id: dto.scenarioId },
-        date: dto.date,
-        status: ReservationStatus.ACTIVE,
-      },
-      relations: ['scenario'],
-    });
-
-    const overlap = existingReservations.find((reservation) => {
-      return (
-        dto.startTime < reservation.endTime &&
-        dto.endTime > reservation.startTime
-      );
-    });
-
-    if (overlap) {
-      throw new BadRequestException(
-        'Ya existe una reserva en ese horario para este escenario',
-      );
-    }
-
     const hours = this.calculateHours(dto.startTime, dto.endTime);
 
     if (hours <= 0) {
       throw new BadRequestException('El rango horario no es válido');
     }
+
+    await this.validateReservationConflict(
+      dto.scenarioId,
+      dto.date,
+      dto.startTime,
+      dto.endTime,
+    );
 
     const totalPrice = hours * Number(scenario.price);
 
@@ -178,6 +202,14 @@ export class ReservationsService {
     if (hours <= 0) {
       throw new BadRequestException('El rango horario no es válido');
     }
+
+    await this.validateReservationConflict(
+      reservation.scenario.id,
+      reservation.date,
+      reservation.startTime,
+      reservation.endTime,
+      reservation.id,
+    );
 
     reservation.totalPrice = hours * Number(reservation.scenario.price);
 
