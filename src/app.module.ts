@@ -7,7 +7,6 @@ import { AppService } from './app.service';
 
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { User } from './users/entities/user.entity';
 import { ReservationsModule } from './reservations/reservations.module';
 import { SportsModule } from './sports/sports.module';
 import { ScenariosModule } from './scenarios/scenarios.module';
@@ -24,7 +23,7 @@ import { ScenariosModule } from './scenarios/scenarios.module';
       username: 'root',
       password: 'Cataratas202420.',
       database: 'programador',
-      entities: [User],
+      autoLoadEntities: true,
       synchronize: true,
     }),
     AuthModule,
@@ -32,7 +31,6 @@ import { ScenariosModule } from './scenarios/scenarios.module';
     SportsModule,
     ScenariosModule,
     ReservationsModule,
-
   ],
   controllers: [AppController],
   providers: [AppService],
